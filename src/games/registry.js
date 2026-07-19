@@ -6,6 +6,9 @@ export const GAME_LIST = [
   { id: 'draw', name: '제비뽑기', icon: '🎴', type: 'assign', load: () => import('./draw/index.js') },
   { id: 'bomb', name: '폭탄 돌리기', icon: '💣', type: 'pick-one', load: () => import('./bomb/index.js') },
   { id: 'dice', name: '주사위', icon: '🎲', type: 'order', load: () => import('./dice/index.js') },
+  { id: 'updown', name: '숫자 업다운', icon: '🔢', type: 'contest', load: () => import('./updown/index.js') },
+  { id: 'reaction', name: '반응속도', icon: '⚡', type: 'contest', load: () => import('./reaction/index.js') },
+  { id: 'rps', name: '가위바위보', icon: '✊', type: 'contest', load: () => import('./rps/index.js') },
 ];
 
 export function findGame(id) { return GAME_LIST.find(g => g.id === id) || null; }
