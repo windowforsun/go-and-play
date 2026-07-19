@@ -114,3 +114,19 @@
   font-family: inherit; font-size: 14px; padding: 8px 10px; border-radius: 12px;
   border: 1px solid rgba(255,255,255,.12); background: var(--bg2); color: var(--ink); resize: vertical; }
 .roulette-count { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); }
+
+/* 랜덤 줄 세우기 */
+.lineup-list { max-width: 320px; margin: 10px auto; display: flex; flex-direction: column; gap: 8px; }
+.lineup-row { display: flex; align-items: center; gap: 12px; opacity: 0; animation: lineup-in .35s ease forwards; }
+@keyframes lineup-in { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+.lineup-num { width: 30px; height: 30px; border-radius: 50%; background: var(--card2); color: var(--yellow);
+  display: flex; align-items: center; justify-content: center; font-weight: bold; flex: 0 0 auto; }
+.lineup-name { flex: 1; color: #fff; padding: 8px 14px; border-radius: var(--radius-pill); text-align: left; }
+
+/* 러시안 룰렛 */
+.russian-cyl { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px auto; max-width: 320px; }
+.russian-chamber { width: 26px; height: 26px; border-radius: 50%; background: var(--card2);
+  border: 2px solid rgba(255,255,255,.15); }
+.russian-chamber.spent { background: transparent; border-style: dashed; opacity: .5; }
+.russian-chamber.active { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,.7); background: var(--pink2); }
+.russian-odds { font-size: 15px; color: var(--dim); margin-top: 4px; }

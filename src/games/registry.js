@@ -9,6 +9,10 @@ export const GAME_LIST = [
   { id: 'updown', name: '숫자 업다운', icon: '🔢', type: 'contest', load: () => import('./updown/index.js') },
   { id: 'reaction', name: '반응속도', icon: '⚡', type: 'contest', load: () => import('./reaction/index.js') },
   { id: 'rps', name: '가위바위보', icon: '✊', type: 'contest', load: () => import('./rps/index.js') },
+  { id: 'lineup', name: '랜덤 줄 세우기', icon: '🚶', type: 'order', load: () => import('./lineup/index.js') },
+  { id: 'dart', name: '원판 다트', icon: '🎯', type: 'pick-one', load: () => import('./dart/index.js') },
+  { id: 'russian', name: '러시안 룰렛', icon: '🔫', type: 'pick-one', load: () => import('./russian/index.js') },
+  { id: 'cardflip', name: '카드 뒤집기', icon: '🃏', type: 'pick-one', load: () => import('./cardflip/index.js') },
 ];
 
 export function findGame(id) { return GAME_LIST.find(g => g.id === id) || null; }
