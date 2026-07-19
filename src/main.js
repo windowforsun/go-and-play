@@ -1,4 +1,7 @@
-import { createMascot } from './mascot/mallang.js';
+import { createHeader } from './ui/header.js';
 const app = document.getElementById('app');
-const m = createMascot();
-app.appendChild(m.el);
+const header = createHeader({ onToggleTheme: () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+}});
+app.appendChild(header.el);

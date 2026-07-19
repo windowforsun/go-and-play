@@ -23,6 +23,13 @@ body {
   border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
 }
+.app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.app-header .logo { font-size: 26px;
+  background: linear-gradient(135deg,#ff6fae,#a06bff 55%,#4fe0d0);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.theme-toggle { background: var(--card2); color: var(--ink); border: none; cursor: pointer;
+  width: 40px; height: 40px; border-radius: 50%; font-size: 18px; box-shadow: var(--shadow-card); }
+.hero { text-align: center; margin-bottom: 18px; }
 .hidden { display: none !important; }
 .mascot { width: 120px; height: 120px; overflow: visible; transform-origin: 50% 100%;
   filter: drop-shadow(0 10px 22px rgba(255,61,132,.5)); }
