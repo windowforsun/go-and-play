@@ -39,3 +39,11 @@ body {
 @keyframes mallang-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 @keyframes mallang-wobble { 0%,100%{transform:scale(1,1)} 20%{transform:scale(1.06,.94)} 45%{transform:scale(.96,1.05)} 70%{transform:scale(1.03,.97)} }
 @keyframes mallang-jump { 0%,100%{transform:translateY(0) scale(1,1)} 40%{transform:translateY(-18px) scale(.95,1.08)} 60%{transform:translateY(0) scale(1.08,.92)} }
+.participant-editor { padding: 18px; margin: 14px 0; }
+.pe-title { font-size: 18px; margin-bottom: 12px; color: var(--pink); }
+.pe-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.pe-dot { width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto; }
+.pe-input { flex: 1; font-family: inherit; font-size: 16px; padding: 8px 12px;
+  border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: var(--bg2); color: var(--ink); }
+.pe-del { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 16px; }
+.pe-add { width: 100%; margin-top: 8px; }
