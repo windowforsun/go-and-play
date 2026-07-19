@@ -1,145 +1,268 @@
-import { rungKey, tracePath } from './ladder.logic.js';
+import { rungKey, tracePath, generateLadder, computeAssignments } from './ladder.logic.js';
 
-const COL_GAP = 70, TOP = 20, ROW_GAP = 22, PAD = 20;
-
-function xOf(col) { return PAD + col * COL_GAP; }
-// 행 y좌표: 세로줄 범위(TOP ~ TOP+rows*ROW_GAP) 안쪽에 균등 배치
-function yOf(row) { return TOP + (row + 0.5) * ROW_GAP; }
+const TOP = 20, ROW_GAP = 22, PAD = 26, MAX_W = 480, MIN_GAP = 34, TOKEN = 16;
+const SPEED = 0.5; // 토큰 이동 속도(px/ms) — 세그먼트 거리에 비례한 등속 이동
 
 export function playLadder(container, ctx, data) {
-  const { participants, results, ladder, assignments } = data;
+  const { participants, results } = data;
   const n = participants.length;
-  const width = PAD * 2 + (n - 1) * COL_GAP;
-  const height = TOP * 2 + ladder.rows * ROW_GAP;
+  const rows = data.ladder.rows;
 
-  ctx.mascot.setState('thinking');
+  // 반응형 열 간격: 참가자가 많아도 컨테이너를 넘지 않고 정렬이 유지되도록
+  const gap = Math.max(MIN_GAP, Math.min(70, (MAX_W - PAD * 2) / Math.max(1, n - 1)));
+  const width = PAD * 2 + (n - 1) * gap;
+  const svgH = TOP * 2 + rows * ROW_GAP;
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const xOf = (col) => PAD + col * gap;
+  const yOf = (row) => TOP + (row + 0.5) * ROW_GAP;
 
+  let state = { ladder: data.ladder, assignments: data.assignments };
+  let running = false;   // 레인 애니메이션 진행 중
+  let cancelled = false; // unmount 취소
+  let timer = null;
+  const revealed = new Set();
+
+  // ── 골격 ──
   const stage = document.createElement('div');
   stage.className = 'ladder-stage';
+  const board = document.createElement('div');
+  board.className = 'ladder-board';
+  board.style.width = width + 'px';
 
-  // 상단 참가자 라벨
-  const top = document.createElement('div');
-  top.className = 'ladder-labels';
-  participants.forEach(p => {
-    const s = document.createElement('span'); s.textContent = p.name; s.style.background = p.color; top.appendChild(s);
-  });
+  const topRow = document.createElement('div');
+  topRow.className = 'ladder-row';
+  const bottomRow = document.createElement('div');
+  bottomRow.className = 'ladder-row';
 
-  // SVG
   const wrap = document.createElement('div');
   wrap.className = 'ladder-svg-wrap';
-  wrap.style.width = width + 'px'; wrap.style.height = height + 'px';
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(svgNS, 'svg');
-  svg.setAttribute('width', width); svg.setAttribute('height', height);
+  wrap.style.width = width + 'px';
+  wrap.style.height = svgH + 'px';
+  let svg, token, highlightLayer;
 
-  // 세로줄
-  for (let c = 0; c < n; c++) {
-    const line = document.createElementNS(svgNS, 'line');
-    line.setAttribute('x1', xOf(c)); line.setAttribute('x2', xOf(c));
-    line.setAttribute('y1', TOP); line.setAttribute('y2', height - TOP);
-    line.style.stroke = 'var(--rung-track)'; // CSS 속성으로 설정해야 var()가 해석됨(프레젠테이션 속성 X)
-    line.setAttribute('stroke-width', '6');
-    line.setAttribute('stroke-linecap', 'round');
-    svg.appendChild(line);
-  }
-  // 가로줄
-  for (let row = 0; row < ladder.rows; row++) {
-    for (let left = 0; left < n - 1; left++) {
-      if (!ladder.rungs.has(rungKey(row, left))) continue;
-      const y = yOf(row);
-      const line = document.createElementNS(svgNS, 'line');
-      line.setAttribute('x1', xOf(left)); line.setAttribute('x2', xOf(left + 1));
-      line.setAttribute('y1', y); line.setAttribute('y2', y);
-      line.setAttribute('stroke', participants[left].color); line.setAttribute('stroke-width', '6');
-      line.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(line);
-    }
-  }
-  wrap.appendChild(svg);
+  // 상단 참가자 라벨 (열에 정렬 · 클릭 시 그 레인 추적)
+  const topLabels = [], bottomLabels = [];
+  participants.forEach((p, i) => {
+    const s = document.createElement('button');
+    s.type = 'button';
+    s.className = 'ladder-label';
+    s.textContent = p.name;
+    s.style.background = p.color;
+    s.style.left = xOf(i) + 'px';
+    s.addEventListener('click', () => traceLane(i));
+    topRow.appendChild(s);
+    topLabels.push(s);
+  });
+  // 하단 결과 라벨 (열에 정렬 · 클릭 시 그 결과에 도착하는 참가자 추적)
+  results.forEach((r, j) => {
+    const s = document.createElement('button');
+    s.type = 'button';
+    s.className = 'ladder-label result';
+    s.textContent = r;
+    s.style.left = xOf(j) + 'px';
+    s.addEventListener('click', () => traceToResult(j));
+    bottomRow.appendChild(s);
+    bottomLabels.push(s);
+  });
 
-  // 토큰(한 참가자씩 순차 애니메이션)
-  const token = document.createElement('div');
-  token.className = 'ladder-token';
-  wrap.appendChild(token);
-
-  // 하단 결과 라벨
-  const bottom = document.createElement('div');
-  bottom.className = 'ladder-labels';
-  results.forEach(r => { const s = document.createElement('span'); s.textContent = r; s.style.background = 'var(--purple)'; bottom.appendChild(s); });
-
+  // 버튼 바
   const actions = document.createElement('div');
   actions.className = 'ladder-actions';
-  const skip = document.createElement('button');
-  skip.className = 'jelly-btn secondary'; skip.textContent = '결과 바로 보기';
-  actions.appendChild(skip);
+  actions.append(
+    mkBtn('전체 결과', 'jelly-btn', revealAll),
+    mkBtn('리셋 🔄', 'jelly-btn secondary', reset),
+    mkBtn('홈', 'jelly-btn secondary', () => ctx.navigate('#/')),
+  );
 
-  stage.append(top, wrap, bottom, actions);
+  board.append(topRow, wrap, bottomRow);
+  stage.append(board, actions);
   container.innerHTML = '';
   container.appendChild(stage);
 
-  // 경로 좌표 계산: 참가자 0부터 순차로 내려가는 애니메이션
-  // 경로는 ladder.logic의 tracePath 단일 출처를 사용(assignments와 규칙 공유 → 도착 열 항상 일치)
+  buildSvg();
+  ctx.mascot.setState('idle');
+
+  function mkBtn(text, cls, on) {
+    const b = document.createElement('button');
+    b.className = cls;
+    b.textContent = text;
+    b.addEventListener('click', on);
+    return b;
+  }
+
+  function buildSvg() {
+    wrap.innerHTML = '';
+    svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', svgH);
+    // 세로줄
+    for (let c = 0; c < n; c++) {
+      const line = document.createElementNS(svgNS, 'line');
+      line.setAttribute('x1', xOf(c)); line.setAttribute('x2', xOf(c));
+      line.setAttribute('y1', TOP); line.setAttribute('y2', svgH - TOP);
+      line.style.stroke = 'var(--rung-track)'; // CSS 속성으로 설정해야 var()가 해석됨
+      line.setAttribute('stroke-width', '6');
+      line.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(line);
+    }
+    // 가로줄
+    for (let row = 0; row < rows; row++) {
+      for (let left = 0; left < n - 1; left++) {
+        if (!state.ladder.rungs.has(rungKey(row, left))) continue;
+        const y = yOf(row);
+        const line = document.createElementNS(svgNS, 'line');
+        line.setAttribute('x1', xOf(left)); line.setAttribute('x2', xOf(left + 1));
+        line.setAttribute('y1', y); line.setAttribute('y2', y);
+        line.setAttribute('stroke', participants[left].color);
+        line.setAttribute('stroke-width', '6');
+        line.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(line);
+      }
+    }
+    highlightLayer = document.createElementNS(svgNS, 'g');
+    svg.appendChild(highlightLayer);
+    wrap.appendChild(svg);
+
+    token = document.createElement('div');
+    token.className = 'ladder-token';
+    token.style.display = 'none';
+    wrap.appendChild(token);
+  }
+
+  // 경로 좌표(꼭짓점) — tracePath 단일 출처 사용 → 도착 열이 항상 결과와 일치
   function pathPoints(startCol) {
-    const seq = tracePath(ladder, startCol);
+    const seq = tracePath(state.ladder, startCol);
     const pts = [{ x: xOf(seq[0]), y: TOP }];
-    for (let row = 0; row < ladder.rows; row++) {
+    for (let row = 0; row < rows; row++) {
       const y = yOf(row);
       pts.push({ x: xOf(seq[row]), y });
       if (seq[row + 1] !== seq[row]) pts.push({ x: xOf(seq[row + 1]), y });
     }
-    pts.push({ x: xOf(seq[ladder.rows]), y: height - TOP });
+    pts.push({ x: xOf(seq[rows]), y: svgH - TOP });
     return pts;
   }
 
-  const reduced = ctx.reducedMotion; // 전역 대신 주입값 사용(Global Constraint)
-  let cancelled = false;
-
-  function animateOne(i, done) {
-    const pts = pathPoints(i);
-    token.style.background = `radial-gradient(circle at 35% 30%, #fff, ${participants[i].color})`;
-    let k = 0;
-    token.style.left = (pts[0].x - 8) + 'px'; token.style.top = (pts[0].y - 8) + 'px';
-    function next() {
-      if (cancelled) return;
-      k++;
-      if (k >= pts.length) { done(); return; }
-      token.style.left = (pts[k].x - 8) + 'px'; token.style.top = (pts[k].y - 8) + 'px';
-      setTimeout(next, reduced ? 0 : 130);
-    }
-    setTimeout(next, reduced ? 0 : 130);
+  function placeToken(pt, color) {
+    token.style.background = `radial-gradient(circle at 35% 30%, #fff, ${color})`;
+    token.style.boxShadow = `0 0 12px ${color}`;
+    token.style.left = (pt.x - TOKEN / 2) + 'px';
+    token.style.top = (pt.y - TOKEN / 2) + 'px';
   }
 
-  function finish() {
+  function drawPath(i, color) {
+    const pts = pathPoints(i);
+    const poly = document.createElementNS(svgNS, 'polyline');
+    poly.setAttribute('points', pts.map(p => `${p.x},${p.y}`).join(' '));
+    poly.setAttribute('fill', 'none');
+    poly.setAttribute('stroke', color);
+    poly.setAttribute('stroke-width', '4');
+    poly.setAttribute('stroke-linecap', 'round');
+    poly.setAttribute('stroke-linejoin', 'round');
+    poly.setAttribute('opacity', '0.95');
+    highlightLayer.appendChild(poly);
+  }
+
+  function litEndpoints(i, on) {
+    topLabels[i].classList.toggle('lit', on);
+    bottomLabels[state.assignments[i]].classList.toggle('lit', on);
+  }
+
+  // 개별 레인 추적 (부드러운 세그먼트 이동, 가로 이동 포함)
+  function traceLane(i) {
+    if (running || cancelled) return;
+    if (revealed.has(i)) { litEndpoints(i, true); return; }
+    running = true;
+    ctx.mascot.setState('thinking');
+    const color = participants[i].color;
+    const pts = pathPoints(i);
+
+    if (ctx.reducedMotion || pts.length <= 1) {
+      finishLane(i, color);
+      return;
+    }
+
+    token.style.display = 'block';
+    token.style.transition = 'none';
+    placeToken(pts[0], color);
+
+    let idx = 0;
+    const step = () => {
+      if (cancelled) return;
+      idx++;
+      if (idx >= pts.length) {
+        token.style.display = 'none';
+        finishLane(i, color);
+        return;
+      }
+      const from = pts[idx - 1], to = pts[idx];
+      const dist = Math.hypot(to.x - from.x, to.y - from.y);
+      const dur = Math.max(55, dist / SPEED);
+      token.style.transition = `top ${dur}ms linear, left ${dur}ms linear`;
+      placeToken(to, color);
+      timer = setTimeout(step, dur);
+    };
+    // 초기 위치를 먼저 그린 뒤(paint) 이동 시작 → 첫 세그먼트도 부드럽게
+    timer = setTimeout(step, 30);
+  }
+
+  function finishLane(i, color) {
+    drawPath(i, color);
+    litEndpoints(i, true);
+    revealed.add(i);
+    running = false;
+    ctx.mascot.setState('idle');
+  }
+
+  function traceToResult(j) {
+    const i = state.assignments.indexOf(j); // 결과 열 j에 도착하는 참가자
+    if (i >= 0) traceLane(i);
+  }
+
+  function revealAll() {
+    if (running || cancelled) return;
+    highlightLayer.innerHTML = '';
+    revealed.clear();
+    for (let i = 0; i < n; i++) {
+      drawPath(i, participants[i].color);
+      litEndpoints(i, true);
+      revealed.add(i);
+    }
     ctx.mascot.setState('celebrate');
-    const map = participants.map((p, i) => ({ name: p.name, color: p.color, result: results[assignments[i]] }));
     const body = document.createElement('div');
-    map.forEach(m => {
+    participants.forEach((p, i) => {
       const row = document.createElement('div');
       row.style.margin = '6px 0';
       const b = document.createElement('b');
-      b.style.color = m.color;
-      b.textContent = m.name;
+      b.style.color = p.color;
+      b.textContent = p.name;
       row.appendChild(b);
-      row.appendChild(document.createTextNode(` → ${m.result}`));
+      row.appendChild(document.createTextNode(` → ${results[state.assignments[i]]}`));
       body.appendChild(row);
     });
     ctx.showResult({
       title: '사다리 결과 🪜',
       bodyEl: body,
       actions: [
-        { label: '다시하기', onClick: () => { ctx.hideResult(); ctx.navigate('#/game/ladder'); } },
+        { label: '리셋 🔄', onClick: () => { ctx.hideResult(); reset(); } },
         { label: '홈', kind: 'secondary', onClick: () => { ctx.hideResult(); ctx.navigate('#/'); } },
       ],
     });
   }
 
-  // 참가자 순차 애니메이션 → 끝나면 결과
-  function runFrom(i) {
+  // 홈에 갔다 오지 않고 그 자리에서 새 사다리로 리셋
+  function reset() {
     if (cancelled) return;
-    if (i >= n) { finish(); return; }
-    animateOne(i, () => runFrom(i + 1));
+    if (timer) { clearTimeout(timer); timer = null; }
+    running = false;
+    if (ctx.hideResult) ctx.hideResult();
+    const ladder = generateLadder(n, rows, ctx.random.rng);
+    state = { ladder, assignments: computeAssignments(ladder) };
+    revealed.clear();
+    topLabels.forEach(l => l.classList.remove('lit'));
+    bottomLabels.forEach(l => l.classList.remove('lit'));
+    buildSvg();
+    ctx.mascot.setState('idle');
   }
-  skip.addEventListener('click', () => { cancelled = true; finish(); });
-  if (reduced) finish(); else runFrom(0);
-  return () => { cancelled = true; };
+
+  return () => { cancelled = true; if (timer) clearTimeout(timer); };
 }
