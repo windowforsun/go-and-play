@@ -13,13 +13,13 @@ export default {
 function render(container, ctx) {
   const ps = ctx.participants;
   const n = ps.length;
-  let running = false;
-
   const SIZE = 300, CX = 150, CY = 150, RING = 108;
+  let holder = 0;
+  let armed = false;
 
   const panel = document.createElement('div');
   panel.className = 'game-panel';
-  panel.innerHTML = '<h2>💣 폭탄 돌리기</h2><div class="hint">돌리다 터지는 순간 든 사람이 술래!</div>';
+  panel.innerHTML = '<h2>💣 폭탄 돌리기</h2><div class="hint">시작하면 히든 타이머 작동! 재빨리 옆으로 패스, 터질 때 든 사람이 술래</div>';
 
   const stage = document.createElement('div');
   stage.className = 'bomb-stage';
@@ -34,6 +34,7 @@ function render(container, ctx) {
     seat.style.left = x + 'px'; seat.style.top = y + 'px';
     seat.style.background = p.color;
     seat.textContent = p.name;
+    seat.addEventListener('click', () => { if (armed) pass(); }); // 자기 자리를 눌러 넘기기도 가능
     stage.appendChild(seat);
     return { seat, x, y };
   });
@@ -41,65 +42,61 @@ function render(container, ctx) {
   const bomb = document.createElement('div');
   bomb.className = 'bomb-icon';
   bomb.textContent = '💣';
-  bomb.style.left = seats[0].x + 'px'; bomb.style.top = seats[0].y + 'px';
   stage.appendChild(bomb);
 
   const actions = document.createElement('div');
   actions.className = 'game-actions';
-  actions.append(
-    mkBtn('시작 💣', 'jelly-btn', start),
-    mkBtn('홈', 'jelly-btn secondary', () => ctx.navigate('#/')),
-  );
+  const mainBtn = mkBtn('시작 💣', 'jelly-btn', onMain);
+  const homeBtn = mkBtn('홈', 'jelly-btn secondary', () => ctx.navigate('#/'));
+  actions.append(mainBtn, homeBtn);
 
   panel.append(stage, actions);
   container.innerHTML = '';
   container.appendChild(panel);
   ctx.mascot.setState('idle');
+  place();
 
-  function moveTo(idx) {
-    seats.forEach(s => s.seat.classList.remove('on'));
-    seats[idx].seat.classList.add('on');
-    bomb.style.left = seats[idx].x + 'px';
-    bomb.style.top = seats[idx].y + 'px';
+  function place() {
+    seats.forEach((s, i) => s.seat.classList.toggle('on', i === holder && armed));
+    bomb.style.left = seats[holder].x + 'px';
+    bomb.style.top = seats[holder].y + 'px';
   }
+
+  function onMain() { if (!armed) start(); else pass(); }
 
   function start() {
-    if (running || cancelled) return;
-    running = true;
+    armed = true;
+    seats.forEach(s => s.seat.classList.remove('boom'));
+    bomb.textContent = '💣';
+    bomb.classList.add('lit');
+    holder = Math.floor(ctx.random.rng() * n);
+    place();
+    mainBtn.textContent = '패스 ➡️';
     ctx.mascot.setState('thinking');
-    seats.forEach(s => s.seat.classList.remove('boom', 'on'));
-    const victim = Math.floor(ctx.random.rng() * n);
-
-    if (ctx.reducedMotion) { boom(victim); return; }
-
-    const total = 3 * n + victim; // 몇 바퀴 돈 뒤 victim에서 정지
-    let step = 0;
-    const tick = () => {
-      if (cancelled) return;
-      moveTo(step % n);
-      step++;
-      if (step > total) { boom(victim); return; }
-      const remain = total - step;
-      const delay = remain > 8 ? 95 : remain > 3 ? 170 : 300; // 감속
-      timer = setTimeout(tick, delay);
-    };
-    tick();
+    const fuse = 4000 + Math.floor(ctx.random.rng() * 8000); // 4~12초, 숨김
+    timer = setTimeout(explode, fuse);
   }
 
-  function boom(victim) {
+  function pass() {
+    if (!armed || cancelled) return;
+    holder = (holder + 1) % n;
+    place();
+  }
+
+  function explode() {
     if (cancelled) return;
-    running = false;
+    armed = false;
+    bomb.classList.remove('lit');
     seats.forEach(s => s.seat.classList.remove('on'));
-    seats[victim].seat.classList.add('boom');
+    seats[holder].seat.classList.add('boom');
     bomb.textContent = '💥';
-    bomb.style.left = seats[victim].x + 'px';
-    bomb.style.top = seats[victim].y + 'px';
+    mainBtn.textContent = '다시 💣';
     ctx.mascot.setState('celebrate');
     ctx.showResult({
       title: '펑! 💥',
-      bodyHtml: `<div style="font-size:22px">술래는 <b style="color:${ps[victim].color}">${escapeHtml(ps[victim].name)}</b>!</div>`,
+      bodyHtml: `<div style="font-size:22px">술래는 <b style="color:${ps[holder].color}">${escapeHtml(ps[holder].name)}</b>!</div>`,
       actions: [
-        { label: '다시', onClick: () => { ctx.hideResult(); bomb.textContent = '💣'; ctx.mascot.setState('idle'); start(); } },
+        { label: '다시', onClick: () => { ctx.hideResult(); start(); } },
         { label: '홈', kind: 'secondary', onClick: () => { ctx.hideResult(); ctx.navigate('#/'); } },
       ],
     });

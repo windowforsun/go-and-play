@@ -94,3 +94,23 @@
 .rps-choice:active { transform: scale(.92); }
 .rps-reveal { display: flex; justify-content: center; align-items: center; gap: 16px; font-size: 44px; margin: 12px 0; min-height: 54px; }
 .rps-reveal .vs { font-size: 18px; color: var(--dim); }
+
+/* 모드 바 (제비뽑기 팀 나누기 등 공용) */
+.draw-modebar { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 6px 0 10px; }
+.mode-btn { font-family: inherit; font-size: 13px; color: var(--ink); cursor: pointer;
+  background: var(--card2); border: 1px solid rgba(255,255,255,.12); padding: 6px 14px; border-radius: var(--radius-pill); }
+.mode-btn.on { background: linear-gradient(135deg,var(--pink2),var(--purple)); color: #fff; border-color: transparent; }
+.draw-teamctl { display: none; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); }
+.mode-step { width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--card2); color: var(--ink); font-size: 16px; line-height: 1; }
+.draw-teamnum { min-width: 18px; text-align: center; font-size: 16px; color: var(--ink); font-weight: bold; }
+
+/* 폭탄 도화선 */
+.bomb-icon.lit { animation: bomb-fuse .5s ease-in-out infinite; }
+@keyframes bomb-fuse { 0%,100%{filter:drop-shadow(0 0 6px #ff9a3d)} 50%{filter:drop-shadow(0 0 18px #ff5c3d)} }
+
+/* 룰렛 설정 */
+.roulette-items { width: 100%; max-width: 340px; min-height: 66px; margin: 6px auto; display: block;
+  font-family: inherit; font-size: 14px; padding: 8px 10px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.12); background: var(--bg2); color: var(--ink); resize: vertical; }
+.roulette-count { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); }
