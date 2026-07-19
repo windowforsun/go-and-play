@@ -47,3 +47,9 @@ body {
   border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: var(--bg2); color: var(--ink); }
 .pe-del { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 16px; }
 .pe-add { width: 100%; margin-top: 8px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,6,24,.6); display: flex;
+  align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+.modal-box { padding: 24px; max-width: 440px; width: 100%; text-align: center; }
+.modal-title { font-size: 22px; margin-bottom: 14px; color: var(--pink); }
+.modal-body { margin-bottom: 18px; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
