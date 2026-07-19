@@ -24,3 +24,11 @@ body {
   box-shadow: var(--shadow-card);
 }
 .hidden { display: none !important; }
+.mascot { width: 120px; height: 120px; overflow: visible; transform-origin: 50% 100%;
+  filter: drop-shadow(0 10px 22px rgba(255,61,132,.5)); }
+.mascot.idle { animation: mallang-float 3.2s ease-in-out infinite, mallang-wobble 2.6s ease-in-out infinite; }
+.mascot.thinking { animation: mallang-wobble .6s ease-in-out infinite; }
+.mascot.celebrate { animation: mallang-jump .5s ease-in-out infinite; }
+@keyframes mallang-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes mallang-wobble { 0%,100%{transform:scale(1,1)} 20%{transform:scale(1.06,.94)} 45%{transform:scale(.96,1.05)} 70%{transform:scale(1.03,.97)} }
+@keyframes mallang-jump { 0%,100%{transform:translateY(0) scale(1,1)} 40%{transform:translateY(-18px) scale(.95,1.08)} 60%{transform:translateY(0) scale(1.08,.92)} }
