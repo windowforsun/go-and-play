@@ -67,7 +67,7 @@ go-and-play/
 
 ## Phase 0 — 프레임워크
 
-### Task 1: 프로젝트 스캐폴드 (셸 + 토big큰 + 테스트 러너)
+### Task 1: 프로젝트 스캐폴드 (셸 + 토큰 + 테스트 러너)
 
 **Files:**
 - Create: `package.json`
@@ -1040,12 +1040,13 @@ git commit -m "$(printf 'feat: game registry with catalog + dynamic loaders\n\nC
   - `ctx` 객체 — 게임 `mount(container, ctx)`에 전달:
     ```
     ctx = { participants, resultItems, navigate(hash), showResult(opts),
-            hideResult(), share(payload), mascot, sound, theme, random }
+            hideResult(), share(payload), mascot, sound, theme, reducedMotion, random }
     ```
     - `participants`: 현재 참가자 배열(허브에서 편집된 값)
     - `resultItems`: 게임이 설정하는 결과 항목(초기 `[]`, 게임이 채움)
     - `navigate('#/')` 등 라우터 이동
     - `showResult(opts)`/`hideResult()`: 결과 모달 제어(opts는 T9 `show` 형식)
+    - `reducedMotion`: `prefers-reduced-motion` 여부(게임은 전역 접근 대신 이 값 사용)
     - `random`: `{ rng: makeRng(seed), shuffle, pick }`
 
 - [ ] **Step 1: `styles/app.css`에 게임 그리드 스타일 추가**
@@ -1114,6 +1115,7 @@ function makeCtx() {
     mascot: header.mascot,
     sound,
     theme: store.get().settings.theme,
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     random: { rng: makeRng((Date.now() & 0xffffffff) >>> 0), shuffle, pick },
   };
 }
@@ -1266,13 +1268,14 @@ git commit -m "$(printf 'feat: ladder generation with no-adjacent-rung invariant
 **Interfaces:**
 - Consumes: `generateLadder`,`rungKey`(Task 12).
 - Produces:
-  - `traverse(ladder, startCol: number) => number` — 한 열에서 시작해 가로줄을 따라 좌우 이동, 도착 열 반환
+  - `tracePath(ladder, startCol: number) => number[]` — 각 행을 지날 때의 열 순서(길이 `rows+1`, `[startCol, …, endCol]`). 경로 계산의 **단일 출처**(애니메이션·배정이 공유)
+  - `traverse(ladder, startCol: number) => number` — 도착 열(=`tracePath` 마지막 값)
   - `computeAssignments(ladder) => number[]` — `result[startCol] = endCol`, 항상 `0..columns-1`의 순열(전단사)
 
 - [ ] **Step 1: 실패 테스트 추가** — `tests/ladder.logic.test.js`에 append
 
 ```js
-import { traverse, computeAssignments } from '../src/games/ladder/ladder.logic.js';
+import { traverse, computeAssignments, tracePath } from '../src/games/ladder/ladder.logic.js';
 
 test('traverse follows a single known rung', () => {
   // 열 3개, 행 1개, (row0,left0) 가로줄만 → 0↔1 스왑, 2는 그대로
@@ -1280,6 +1283,16 @@ test('traverse follows a single known rung', () => {
   assert.equal(traverse(ladder, 0), 1);
   assert.equal(traverse(ladder, 1), 0);
   assert.equal(traverse(ladder, 2), 2);
+});
+
+test('tracePath returns rows+1 columns ending at traverse()', () => {
+  const l = generateLadder(5, 10, makeRng(7));
+  for (let c = 0; c < l.columns; c++) {
+    const seq = tracePath(l, c);
+    assert.equal(seq.length, l.rows + 1);
+    assert.equal(seq[0], c);
+    assert.equal(seq[seq.length - 1], traverse(l, c)); // 단일 출처 일치
+  }
 });
 
 test('computeAssignments is always a bijection (permutation)', () => {
@@ -1300,13 +1313,21 @@ Expected: FAIL — `traverse`/`computeAssignments` 미정의.
 - [ ] **Step 3: 최소 구현** — `src/games/ladder/ladder.logic.js`에 추가
 
 ```js
-export function traverse(ladder, startCol) {
+// 경로의 단일 출처: 각 행을 지나며 도달하는 열 순서(길이 rows+1).
+export function tracePath(ladder, startCol) {
+  const seq = [startCol];
   let col = startCol;
   for (let row = 0; row < ladder.rows; row++) {
     if (ladder.rungs.has(rungKey(row, col - 1))) col -= 1;
     else if (ladder.rungs.has(rungKey(row, col))) col += 1;
+    seq.push(col);
   }
-  return col;
+  return seq;
+}
+
+export function traverse(ladder, startCol) {
+  const seq = tracePath(ladder, startCol);
+  return seq[seq.length - 1];
 }
 
 export function computeAssignments(ladder) {
@@ -1468,7 +1489,7 @@ git commit -m "$(printf 'feat: ladder game module + setup screen\n\nCo-Authored-
 - [ ] **Step 1: `src/games/ladder/play.js` 재작성**
 
 ```js
-import { rungKey } from './ladder.logic.js';
+import { rungKey, tracePath } from './ladder.logic.js';
 
 const COL_GAP = 70, TOP = 20, ROW_GAP = 22, PAD = 20;
 
@@ -1507,7 +1528,8 @@ export function playLadder(container, ctx, data) {
     const line = document.createElementNS(svgNS, 'line');
     line.setAttribute('x1', xOf(c)); line.setAttribute('x2', xOf(c));
     line.setAttribute('y1', TOP); line.setAttribute('y2', height - TOP);
-    line.setAttribute('stroke', 'var(--rung-track)'); line.setAttribute('stroke-width', '6');
+    line.style.stroke = 'var(--rung-track)'; // CSS 속성으로 설정해야 var()가 해석됨(프레젠테이션 속성 X)
+    line.setAttribute('stroke-width', '6');
     line.setAttribute('stroke-linecap', 'round');
     svg.appendChild(line);
   }
@@ -1547,20 +1569,20 @@ export function playLadder(container, ctx, data) {
   container.appendChild(stage);
 
   // 경로 좌표 계산: 참가자 0부터 순차로 내려가는 애니메이션
+  // 경로는 ladder.logic의 tracePath 단일 출처를 사용(assignments와 규칙 공유 → 도착 열 항상 일치)
   function pathPoints(startCol) {
-    const pts = [{ x: xOf(startCol), y: TOP }];
-    let col = startCol;
+    const seq = tracePath(ladder, startCol);
+    const pts = [{ x: xOf(seq[0]), y: TOP }];
     for (let row = 0; row < ladder.rows; row++) {
       const y = yOf(row);
-      pts.push({ x: xOf(col), y });
-      if (ladder.rungs.has(rungKey(row, col - 1))) { col -= 1; pts.push({ x: xOf(col), y }); }
-      else if (ladder.rungs.has(rungKey(row, col))) { col += 1; pts.push({ x: xOf(col), y }); }
+      pts.push({ x: xOf(seq[row]), y });
+      if (seq[row + 1] !== seq[row]) pts.push({ x: xOf(seq[row + 1]), y });
     }
-    pts.push({ x: xOf(col), y: height - TOP });
+    pts.push({ x: xOf(seq[ladder.rows]), y: height - TOP });
     return pts;
   }
 
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = ctx.reducedMotion; // 전역 대신 주입값 사용(Global Constraint)
   let cancelled = false;
 
   function animateOne(i, done) {
@@ -1638,7 +1660,7 @@ git commit -m "$(printf 'feat: ladder rendering, token animation, result flow\n\
 - [ ] **Step 1: 전체 테스트 실행**
 
 Run: `node --test`
-Expected: PASS — random(5) + store(4) + theme(2) + router(3) + participant(4) + ladder.logic(4) = 22 tests, 0 fail.
+Expected: PASS — random(5) + store(4) + theme(2) + router(3) + participant(4) + ladder.logic(5) = 23 tests, 0 fail.
 
 - [ ] **Step 2: 엔드투엔드 수동 시나리오 (스펙 §6 흐름)**
 
@@ -1700,3 +1722,14 @@ git push
 **3. Type consistency:** `ctx`(participants/resultItems/navigate/showResult/hideResult/share/mascot/sound/theme/random) — T11 정의와 T14-15 사용 일치. `mascot.setState`, `modal.show/hide`, `generateLadder/computeAssignments/rungKey` 시그니처 태스크 간 일치 ✓
 
 > 미해결로 남긴 알려진 사항(의도적): 결과 항목 개수 = 참가자 수로 고정(사다리 특성). 항목 룰렛 등 변형은 범위 밖(스펙 §13).
+
+## 검수 반영 (계획 리뷰 2026-07-19)
+
+대화 결정 ↔ 계획 전수 대조 + 순수 로직 실측(node:test 23개 PASS, 전단사 4000조합 위반 0)에서 나온 항목 반영:
+
+- **E1**(버그): SVG 세로 레일 `stroke`를 프레젠테이션 속성 대신 `line.style.stroke`로 설정(CSS 변수 해석). — Task 15
+- **C1**(원칙): `prefers-reduced-motion`을 `ctx.reducedMotion`으로 주입, 게임의 `window` 직접 접근 제거. — Task 11/15
+- **C2**(스펙 정합): UI 검증은 로컬 서버 수동으로 확정, Playwright는 선택/후순위(스펙 §11 정정).
+- **A1**(DRY): 경로 계산을 `ladder.logic`의 `tracePath` 단일 출처로 통합(애니메이션·배정 규칙 공유) + 일치 테스트. — Task 13/15
+- **D1**(오타): Task 1 제목 "토큰" 수정.
+- 남긴 선택 항목(미반영): A2(초기 테마 아이콘), A3(ctx.theme 스냅샷), O1(사다리 가로 스크롤), O2(게임별 CSS 정적링크), O3(alert 안내).
