@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<!-- ⚠️ 브레인스토밍 목업 — 정식 코드 아님. 컨셉 C 발전형: 다크 젤리 + 마스코트 "말랑이" + 애니메이션. -->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>컨셉 C · 다크 젤리 + 마스코트 — 고 앤 플레이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#160f2e; --bg2:#0e0a20; --card:#241a44; --card2:#2c2050;
+    --ink:#efe9ff; --dim:#a99fd0;
+    --pink:#ff6fae; --pink2:#ff3d84; --purple:#a06bff; --mint:#4fe0d0; --yellow:#ffd45c; --blue:#6db8ff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Jua',sans-serif; color:var(--ink); min-height:100vh; padding:20px 16px 60px;
+    background:radial-gradient(120% 80% at 50% -10%,#241847 0%,var(--bg1) 45%,var(--bg2) 100%);
+    overflow-x:hidden; position:relative;
+  }
+  /* 배경 글로우 blob */
+  .glow{position:fixed; border-radius:50%; filter:blur(70px); opacity:.45; z-index:0; pointer-events:none;}
+  .g1{width:260px;height:260px;background:#ff3d84;top:-60px;left:-70px;animation:drift 14s ease-in-out infinite;}
+  .g2{width:300px;height:300px;background:#6b3dff;bottom:-80px;right:-90px;animation:drift 18s ease-in-out infinite reverse;}
+  .g3{width:200px;height:200px;background:#2fb8c8;top:40%;right:-60px;animation:drift 20s ease-in-out infinite;}
+  @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,30px) scale(1.15)}}
+  .wrap{max-width:520px; margin:0 auto; position:relative; z-index:1;}
+  .badge{display:inline-block; font-size:14px; color:#fff; padding:6px 16px; margin-bottom:10px;
+    background:linear-gradient(135deg,var(--purple),var(--pink)); border-radius:999px;
+    box-shadow:0 6px 18px rgba(160,107,255,.5);}
+
+  /* ── 히어로 + 마스코트 ── */
+  .hero{text-align:center; margin:6px 0 22px;}
+  .mascot-stage{position:relative; display:inline-block; margin-bottom:6px;}
+  .mascot{width:150px; height:150px; overflow:visible; transform-origin:50% 100%;
+    animation:float 3.2s ease-in-out infinite, wobble 2.6s ease-in-out infinite;
+    filter:drop-shadow(0 10px 22px rgba(255,61,132,.5));}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  @keyframes wobble{
+    0%,100%{transform:scale(1,1)} 20%{transform:scale(1.06,.94)}
+    45%{transform:scale(.96,1.05)} 70%{transform:scale(1.03,.97)}
+  }
+  .bubble{position:absolute; top:-6px; right:-84px; background:#fff; color:#5a4a6a; font-size:15px;
+    padding:8px 14px; border-radius:16px 16px 16px 4px; box-shadow:0 6px 16px rgba(0,0,0,.35);
+    white-space:nowrap; animation:pop 3s ease-in-out infinite;}
+  .bubble:after{content:""; position:absolute; left:-6px; bottom:6px; border:7px solid transparent;
+    border-right-color:#fff; border-left:0;}
+  @keyframes pop{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+  .logo{font-size:44px; letter-spacing:1px; margin-top:2px;
+    background:linear-gradient(135deg,#ff6fae,#a06bff 55%,#4fe0d0);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 3px 10px rgba(160,107,255,.5));}
+  .tag{font-size:16px; color:var(--dim); margin-top:8px; line-height:1.6;}
+
+  /* ── 게임 카드 ── */
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:22px 0;}
+  .card{background:linear-gradient(160deg,var(--card2),var(--card)); border:1px solid rgba(255,255,255,.06);
+    border-radius:24px; padding:20px 12px; text-align:center; cursor:pointer;
+    box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
+    transition:transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .16s;}
+  .card:hover{transform:translateY(-5px); box-shadow:0 18px 34px rgba(160,107,255,.35), inset 0 1px 0 rgba(255,255,255,.12);}
+  .card:active{transform:translateY(2px) scale(.97);}
+  .card .ic{font-size:34px; width:60px; height:60px; margin:0 auto 10px; border-radius:18px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 14px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.25);}
+  .card:nth-child(1) .ic{background:linear-gradient(135deg,#ff6fae,#ff3d84)}
+  .card:nth-child(2) .ic{background:linear-gradient(135deg,#6db8ff,#3d7bff)}
+  .card:nth-child(3) .ic{background:linear-gradient(135deg,#ffd45c,#ffab3d)}
+  .card:nth-child(4) .ic{background:linear-gradient(135deg,#4fe0d0,#2bb8a8)}
+  .card:nth-child(5) .ic{background:linear-gradient(135deg,#a06bff,#7b3dff)}
+  .card:nth-child(6) .ic{background:linear-gradient(135deg,#ff9a76,#ff6f3d)}
+  .card .nm{font-size:16px;}
+
+  /* ── 사다리 미리보기 (마커 애니메이션) ── */
+  .panel{background:linear-gradient(160deg,var(--card2),var(--card)); border:1px solid rgba(255,255,255,.06);
+    border-radius:28px; padding:20px; box-shadow:0 12px 28px rgba(0,0,0,.35);}
+  .panel h2{font-size:18px; margin-bottom:14px; color:var(--pink);}
+  .ladder-box{position:relative; width:270px; margin:0 auto;}
+  .token{position:absolute; top:2px; left:29px; width:16px; height:16px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,#ff3d84); box-shadow:0 0 12px #ff3d84;
+    animation:drop 3.6s ease-in-out infinite;}
+  @keyframes drop{
+    0%{top:2px;left:29px} 30%{top:52px;left:29px} 45%{top:52px;left:109px}
+    70%{top:118px;left:109px} 85%{top:118px;left:109px} 100%{top:2px;left:29px;opacity:.6}
+  }
+  .names{display:flex; justify-content:space-around; margin-top:10px;}
+  .names span{font-size:14px; color:#fff; padding:4px 12px; border-radius:999px;}
+  .names .n1{background:var(--pink2)} .names .n2{background:var(--mint)} .names .n3{background:var(--yellow);color:#4a3a1a} .names .n4{background:var(--purple)}
+
+  /* ── CTA ── */
+  .cta{display:flex; align-items:center; justify-content:center; gap:10px; width:100%; margin-top:24px;
+    font-family:inherit; font-size:22px; color:#fff; border:none; padding:16px; border-radius:999px; cursor:pointer;
+    background:linear-gradient(135deg,#ff3d84,#a06bff); box-shadow:0 0 0 rgba(255,61,132,.6);
+    animation:glow 2.2s ease-in-out infinite; transition:transform .16s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes glow{0%,100%{box-shadow:0 8px 18px rgba(255,61,132,.4)}50%{box-shadow:0 8px 30px rgba(160,107,255,.75)}}
+  .cta:hover{transform:translateY(-3px)}
+  .cta:active{transform:translateY(2px) scale(.98)}
+  .cta .mini{width:30px;height:30px;animation:wobble 1.8s ease-in-out infinite; transform-origin:50% 100%;}
+
+  .foot{margin-top:32px; text-align:center; font-size:15px;}
+  .foot a{color:var(--purple);}
+  .meet{margin-top:18px; text-align:center; font-size:13px; color:var(--dim);}
+  .meet b{color:var(--pink);}
+
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;}}
+</style>
+</head>
+<body>
+  <div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+
+  <!-- 마스코트 "말랑이" 심볼 정의 (눈 깜빡임은 SVG SMIL로 모든 인스턴스에 복제됨) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ff8ec4"/><stop offset=".55" stop-color="#ff5c9e"/><stop offset="1" stop-color="#a06bff"/>
+      </linearGradient>
+      <radialGradient id="glossG" cx="35%" cy="30%" r="60%">
+        <stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <symbol id="mallang" viewBox="0 0 120 120">
+        <!-- 몸통 (젤리 blob) -->
+        <path d="M60 16 C32 16 17 42 17 68 C17 97 37 110 60 110 C83 110 103 97 103 68 C103 42 88 16 60 16 Z" fill="url(#body)"/>
+        <!-- 광택 -->
+        <ellipse cx="46" cy="44" rx="20" ry="15" fill="url(#glossG)" transform="rotate(-18 46 44)"/>
+        <!-- 볼터치 -->
+        <ellipse cx="34" cy="80" rx="8" ry="5" fill="#ff3d84" opacity=".45"/>
+        <ellipse cx="86" cy="80" rx="8" ry="5" fill="#ff3d84" opacity=".45"/>
+        <!-- 눈 (깜빡임) -->
+        <ellipse cx="47" cy="64" rx="6.5" ry="9" fill="#2a1638">
+          <animate attributeName="ry" values="9;9;1;9;9" keyTimes="0;.45;.5;.55;1" dur="4s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="73" cy="64" rx="6.5" ry="9" fill="#2a1638">
+          <animate attributeName="ry" values="9;9;1;9;9" keyTimes="0;.45;.5;.55;1" dur="4s" repeatCount="indefinite"/>
+        </ellipse>
+        <circle cx="49" cy="61" r="2" fill="#fff"/><circle cx="75" cy="61" r="2" fill="#fff"/>
+        <!-- 입 -->
+        <path d="M52 80 Q60 89 68 80" stroke="#2a1638" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 머리 위 반짝이 -->
+        <path d="M60 6 l2.5 5 5 2.5 -5 2.5 -2.5 5 -2.5 -5 -5 -2.5 5 -2.5 z" fill="#ffd45c">
+          <animate attributeName="opacity" values="1;.3;1" dur="1.8s" repeatCount="indefinite"/>
+        </path>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="wrap">
+    <div class="badge">🍮 컨셉 C · 다크 젤리 + 마스코트</div>
+
+    <div class="hero">
+      <div class="mascot-stage">
+        <svg class="mascot"><use href="#mallang"/></svg>
+        <div class="bubble">누가 걸릴까? 🎲</div>
+      </div>
+      <div class="logo">GO &amp; PLAY</div>
+      <div class="tag">사다리부터 룰렛까지,<br>뽑기 · 술래 정하기 게임 모음</div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><span class="ic">🪜</span><span class="nm">사다리 타기</span></div>
+      <div class="card"><span class="ic">🎡</span><span class="nm">룰렛</span></div>
+      <div class="card"><span class="ic">👆</span><span class="nm">손가락 짚기</span></div>
+      <div class="card"><span class="ic">🎴</span><span class="nm">제비뽑기</span></div>
+      <div class="card"><span class="ic">💣</span><span class="nm">폭탄 돌리기</span></div>
+      <div class="card"><span class="ic">🎲</span><span class="nm">주사위</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>🪜 사다리 타기 미리보기</h2>
+      <div class="ladder-box">
+        <div class="token"></div>
+        <svg width="270" height="150" viewBox="0 0 270 150">
+          <g stroke="#3a2c60" stroke-width="8" fill="none" stroke-linecap="round">
+            <line x1="35" y1="14" x2="35" y2="136"/><line x1="115" y1="14" x2="115" y2="136"/>
+            <line x1="195" y1="14" x2="195" y2="136"/><line x1="235" y1="14" x2="235" y2="136"/>
+          </g>
+          <g stroke-width="8" fill="none" stroke-linecap="round">
+            <line x1="35" y1="52" x2="115" y2="52" stroke="#ff6fae"/>
+            <line x1="115" y1="86" x2="195" y2="86" stroke="#6db8ff"/>
+            <line x1="195" y1="44" x2="235" y2="44" stroke="#4fe0d0"/>
+            <line x1="35" y1="118" x2="115" y2="118" stroke="#a06bff"/>
+          </g>
+          <circle cx="35" cy="12" r="9" fill="#ff3d84"/><circle cx="115" cy="12" r="9" fill="#2bb8a8"/>
+          <circle cx="195" cy="12" r="9" fill="#ffd45c"/><circle cx="235" cy="12" r="9" fill="#a06bff"/>
+        </svg>
+      </div>
+      <div class="names"><span class="n1">민수</span><span class="n2">지현</span><span class="n3">영후</span><span class="n4">수빈</span></div>
+    </div>
+
+    <button class="cta"><svg class="mini"><use href="#mallang"/></svg> 게임 시작하기</button>
+
+    <div class="meet">👋 대표 캐릭터 <b>말랑이</b> — 화면 곳곳에서 통통 튀고 눈을 깜빡여요</div>
+    <div class="foot"><a href="./index.html">← 컨셉 비교로 돌아가기</a></div>
+  </div>
+</body>
+</html>
