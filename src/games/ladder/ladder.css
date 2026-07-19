@@ -1,0 +1,14 @@
+.ladder-setup { padding: 18px; margin-top: 8px; }
+.ladder-setup h2 { font-size: 20px; color: var(--pink); margin-bottom: 12px; }
+.ladder-results .pe-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.ladder-results .pe-input { flex: 1; font-family: inherit; font-size: 16px; padding: 8px 12px;
+  border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: var(--bg2); color: var(--ink); }
+.ladder-actions { display: flex; gap: 10px; margin-top: 16px; }
+.ladder-actions .jelly-btn { flex: 1; }
+.ladder-stage { margin-top: 10px; text-align: center; }
+.ladder-svg-wrap { position: relative; display: inline-block; margin: 10px auto; }
+.ladder-token { position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--pink2)); box-shadow: 0 0 12px var(--pink2);
+  transition: top .25s linear, left .25s linear; }
+.ladder-labels { display: flex; justify-content: space-around; margin-top: 8px; }
+.ladder-labels span { font-size: 13px; color: #fff; padding: 3px 10px; border-radius: var(--radius-pill); }
