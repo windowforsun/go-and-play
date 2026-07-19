@@ -83,7 +83,9 @@ async function renderGame(id) {
   const meta = findGame(id);
   if (!meta || !meta.load) { window.location.hash = '#/'; return; }
   clearView();
+  const expectedHash = `#/game/${id}`;
   const mod = await meta.load();
+  if (window.location.hash !== expectedHash) return; // 로딩 중 다른 곳으로 이동했으면 무시
   activeGame = mod.default;
   activeGame.mount(viewEl, makeCtx());
 }
