@@ -113,7 +113,16 @@ export function playLadder(container, ctx, data) {
     ctx.mascot.setState('celebrate');
     const map = participants.map((p, i) => ({ name: p.name, color: p.color, result: results[assignments[i]] }));
     const body = document.createElement('div');
-    body.innerHTML = map.map(m => `<div style="margin:6px 0"><b style="color:${m.color}">${m.name}</b> → ${m.result}</div>`).join('');
+    map.forEach(m => {
+      const row = document.createElement('div');
+      row.style.margin = '6px 0';
+      const b = document.createElement('b');
+      b.style.color = m.color;
+      b.textContent = m.name;
+      row.appendChild(b);
+      row.appendChild(document.createTextNode(` → ${m.result}`));
+      body.appendChild(row);
+    });
     ctx.showResult({
       title: '사다리 결과 🪜',
       bodyEl: body,
@@ -132,4 +141,5 @@ export function playLadder(container, ctx, data) {
   }
   skip.addEventListener('click', () => { cancelled = true; finish(); });
   if (reduced) finish(); else runFrom(0);
+  return () => { cancelled = true; };
 }

@@ -1,6 +1,8 @@
 import { generateLadder, computeAssignments } from './ladder.logic.js';
 import { playLadder } from './play.js';
 
+let activeStop = null;
+
 export default {
   id: 'ladder',
   name: '사다리 타기',
@@ -15,6 +17,7 @@ export default {
   },
 
   unmount() {
+    if (activeStop) { activeStop(); activeStop = null; }
     if (this._container) this._container.innerHTML = '';
   },
 };
@@ -53,7 +56,7 @@ function renderSetup(container, ctx) {
   start.addEventListener('click', () => {
     const ladder = generateLadder(participants.length, Math.max(8, participants.length * 3), ctx.random.rng);
     const assignments = computeAssignments(ladder);
-    playLadder(container, ctx, { participants, results: results.map(r => r.trim() || '꽝'), ladder, assignments });
+    activeStop = playLadder(container, ctx, { participants, results: results.map(r => r.trim() || '꽝'), ladder, assignments });
   });
   actions.append(back, start);
   wrap.appendChild(actions);
