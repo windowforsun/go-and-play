@@ -1,0 +1,23 @@
+:root {
+  --font: 'Jua', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius-card: 24px;
+  --radius-pill: 999px;
+  --dur-fast: .16s;
+  --dur-med: .3s;
+  /* dark (기본값) */
+  --bg1:#160f2e; --bg2:#0e0a20; --card:#241a44; --card2:#2c2050;
+  --ink:#efe9ff; --dim:#a99fd0;
+  --pink:#ff6fae; --pink2:#ff3d84; --purple:#a06bff;
+  --mint:#4fe0d0; --yellow:#ffd45c; --blue:#6db8ff;
+  --shadow-card: 0 10px 24px rgba(0,0,0,.35);
+  --rung-track:#3a2c60;
+}
+[data-theme="light"] {
+  --bg1:#fbe9ff; --bg2:#e5fff6; --card:#ffffff; --card2:#ffffff;
+  --ink:#5a4a6a; --dim:#8a7d9a;
+  --shadow-card: 0 8px 20px rgba(150,130,200,.18);
+  --rung-track:#e3d9f5;
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
