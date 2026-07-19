@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- ⚠️ 브레인스토밍 목업 — 정식 코드 아님. 디자인 컨셉 비교 허브. -->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>디자인 컨셉 비교 — 고 앤 플레이</title>
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#0f1020; color:#e8e8f0;
+    min-height:100vh; padding:32px 16px 60px; line-height:1.6;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .warn{background:#2a1a1a; border:1px solid #6b3030; color:#ffb4b4; font-size:13px;
+    padding:10px 14px; border-radius:8px; margin-bottom:24px;}
+  h1{font-size:26px; margin-bottom:6px;}
+  .sub{color:#9a9ab0; font-size:15px; margin-bottom:28px;}
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px;}
+  .c{background:#191a30; border:1px solid #2c2d4a; border-radius:14px; overflow:hidden;
+    text-decoration:none; color:inherit; display:flex; flex-direction:column; transition:transform .15s, border-color .15s;}
+  .c:hover{transform:translateY(-4px); border-color:#5a5ad0;}
+  .thumb{height:120px; display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:700;}
+  .ta{background:#161634; color:#ffd93d; text-shadow:2px 2px 0 #ff5c8a; font-family:monospace;}
+  .tb{background:#fdfcf3; color:#ff6b6b;}
+  .tc{background:linear-gradient(160deg,#fbe9ff,#e5fff6);
+     background-clip:text;-webkit-background-clip:text;}
+  .tc span{background:linear-gradient(135deg,#ff5c8a,#a78bfa,#5fd0c5);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .cbody{padding:16px;}
+  .cbody h3{font-size:17px; margin-bottom:6px;}
+  .cbody p{font-size:13px; color:#a9a9c0;}
+  .tag{display:inline-block; font-size:11px; margin-top:10px; padding:3px 9px; border-radius:999px;
+    background:#2c2d4a; color:#b9b9e6;}
+  .rec{background:#1e3a2e; color:#7bffb0;}
+  .note{margin-top:30px; font-size:13px; color:#8a8aa0; border-top:1px solid #2c2d4a; padding-top:16px;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="warn">⚠️ 이 페이지는 <b>브레인스토밍 목업</b>입니다. 정식 코드가 아니며 컨셉 결정 후 삭제될 수 있습니다.</div>
+    <h1>🎮 고 앤 플레이 · 디자인 컨셉 비교</h1>
+    <p class="sub">아래 세 컨셉을 눌러 각 화면을 보고, 마음에 드는 방향을 골라주세요. (같은 홈 화면 + 사다리 타기 미리보기를 세 가지 스타일로 제작)</p>
+
+    <div class="cards">
+      <a class="c" href="./concept-a-pixel.html">
+        <div class="thumb ta">GO&amp;PLAY</div>
+        <div class="cbody">
+          <h3>A · 도트 / 픽셀</h3>
+          <p>8비트 레트로 감성. 통통 튀는 픽셀, 네온 색감, 하드 그림자. "게임"다운 재미가 큼.</p>
+          <span class="tag">귀여움 + 게임 느낌</span>
+        </div>
+      </a>
+      <a class="c" href="./concept-b-handdrawn.html">
+        <div class="thumb tb">Go &amp; Play</div>
+        <div class="cbody">
+          <h3>B · 손그림 / 낙서</h3>
+          <p>공책에 손으로 슥슥 그린 느낌. 삐뚤빼뚤한 선, 손글씨체. 따뜻하고 친근함.</p>
+          <span class="tag">따뜻함 + 친근함</span>
+        </div>
+      </a>
+      <a class="c" href="./concept-c-jelly.html">
+        <div class="thumb tc"><span>GO &amp; PLAY</span></div>
+        <div class="cbody">
+          <h3>C · 젤리 팝</h3>
+          <p>말랑말랑 파스텔, 부드러운 그림자, 젤리처럼 눌리는 버튼. 세련된 모바일 미니게임 감성.</p>
+          <span class="tag rec">추천 · 세련됨 + 확장성</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="note">
+      💡 세 컨셉은 <b>섞어도</b> 됩니다 (예: C의 레이아웃 + A의 픽셀 캐릭터). 고르신 뒤 세부 조정 가능합니다.<br>
+      각 페이지 하단의 "← 컨셉 비교로 돌아가기"로 이 화면에 다시 올 수 있습니다.
+    </div>
+  </div>
+</body>
+</html>

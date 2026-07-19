@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<!-- ⚠️ 브레인스토밍 목업 — 정식 코드 아님. 디자인 컨셉 B(손그림/낙서) 비교용. -->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>컨셉 B · 손그림 — 고 앤 플레이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fdfcf3; --ink:#33312e; --red:#ff6b6b; --blue:#5b8def;
+    --yellow:#f7c948; --green:#5bbf6a; --purple:#a678de; --pink:#ff8fab;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Gaegu',cursive; background:var(--paper); color:var(--ink);
+    min-height:100vh; padding:22px 16px 60px;
+    background-image:
+      linear-gradient(#e8e6d8 1px,transparent 1px);
+    background-size:100% 30px;
+  }
+  .wrap{max-width:520px; margin:0 auto;}
+  .badge{display:inline-block; font-size:16px; font-weight:700; color:var(--purple);
+    border:2px solid var(--purple); padding:2px 12px; margin-bottom:14px;
+    border-radius:225px 15px 225px 15px/15px 225px 15px 225px; transform:rotate(-1.5deg);}
+  header{text-align:center; margin-bottom:26px;}
+  .logo{font-size:52px; font-weight:700; line-height:1; letter-spacing:1px;}
+  .logo .g{color:var(--red)} .logo .a{color:var(--blue)} .logo .amp{color:var(--yellow)} .logo .p{color:var(--green)}
+  .underline{display:block; margin:4px auto 0; width:200px;}
+  .tag{font-size:22px; color:#6b6862; margin-top:12px; line-height:1.4;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:24px 0;}
+  .card{background:#fff; border:3px solid var(--ink); padding:16px 10px; text-align:center;
+    cursor:pointer; transition:transform .12s;
+    border-radius:255px 15px 225px 15px/15px 225px 15px 255px;
+    box-shadow:2px 3px 0 rgba(51,49,46,.5);}
+  .card:nth-child(even){border-radius:15px 225px 15px 255px/225px 15px 255px 15px; transform:rotate(1.2deg);}
+  .card:nth-child(odd){transform:rotate(-1.2deg);}
+  .card:hover{transform:rotate(0) scale(1.04);}
+  .card .ic{font-size:36px; display:block; margin-bottom:6px;}
+  .card .nm{font-size:21px; font-weight:700;}
+  .panel{background:#fff; border:3px solid var(--ink); padding:20px; margin-top:6px;
+    border-radius:225px 15px 225px 15px/15px 225px 15px 225px; box-shadow:2px 3px 0 rgba(51,49,46,.5);}
+  .panel h2{font-size:24px; font-weight:700; margin-bottom:12px; color:var(--purple);}
+  .ladder{display:block; margin:0 auto;}
+  .names{display:flex; justify-content:space-around; font-size:20px; font-weight:700; margin-top:6px;}
+  .names .n1{color:var(--red)} .names .n2{color:var(--green)} .names .n3{color:var(--yellow)} .names .n4{color:var(--purple)}
+  .cta{display:block; width:100%; margin-top:24px; font-family:inherit; font-size:28px; font-weight:700;
+    background:var(--yellow); color:var(--ink); border:3px solid var(--ink); padding:14px; cursor:pointer;
+    border-radius:255px 15px 225px 15px/15px 225px 15px 255px; box-shadow:3px 4px 0 rgba(51,49,46,.6);
+    transform:rotate(-1deg); transition:transform .12s;}
+  .cta:hover{transform:rotate(0) scale(1.02);}
+  .cta:active{transform:translateY(3px); box-shadow:1px 1px 0 rgba(51,49,46,.6);}
+  .foot{margin-top:32px; text-align:center; font-size:18px;}
+  .foot a{color:var(--blue);}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="badge">✏️ 컨셉 B · 손그림 / 낙서</div>
+    <header>
+      <div class="logo"><span class="g">Go</span> <span class="amp">&amp;</span> <span class="p">Play</span></div>
+      <svg class="underline" width="200" height="12" viewBox="0 0 200 12">
+        <path d="M4 7 Q50 2 100 7 T196 6" stroke="#ff6b6b" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="tag">사다리부터 룰렛까지,<br>뽑기 · 술래 정하기 게임 모음</div>
+    </header>
+
+    <div class="grid">
+      <div class="card"><span class="ic">🪜</span><span class="nm">사다리 타기</span></div>
+      <div class="card"><span class="ic">🎡</span><span class="nm">룰렛</span></div>
+      <div class="card"><span class="ic">👆</span><span class="nm">손가락 짚기</span></div>
+      <div class="card"><span class="ic">🎴</span><span class="nm">제비뽑기</span></div>
+      <div class="card"><span class="ic">💣</span><span class="nm">폭탄 돌리기</span></div>
+      <div class="card"><span class="ic">🎲</span><span class="nm">주사위</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>🪜 사다리 타기 미리보기</h2>
+      <svg class="ladder" width="270" height="150" viewBox="0 0 270 150">
+        <g stroke="#33312e" stroke-width="3" fill="none" stroke-linecap="round">
+          <path d="M35 12 Q32 75 35 138"/>
+          <path d="M115 12 Q118 75 115 138"/>
+          <path d="M195 12 Q192 75 195 138"/>
+          <path d="M235 12 Q238 75 235 138"/>
+        </g>
+        <g stroke-width="3" fill="none" stroke-linecap="round">
+          <path d="M35 48 Q75 44 115 50" stroke="#ff6b6b"/>
+          <path d="M115 82 Q155 86 195 80" stroke="#5b8def"/>
+          <path d="M195 42 Q215 46 235 42" stroke="#5bbf6a"/>
+          <path d="M35 108 Q75 104 115 110" stroke="#a678de"/>
+        </g>
+        <circle cx="35" cy="10" r="7" fill="#ff6b6b"/>
+        <circle cx="115" cy="10" r="7" fill="#5bbf6a"/>
+        <circle cx="195" cy="10" r="7" fill="#f7c948"/>
+        <circle cx="235" cy="10" r="7" fill="#a678de"/>
+      </svg>
+      <div class="names"><span class="n1">민수</span><span class="n2">지현</span><span class="n3">영후</span><span class="n4">수빈</span></div>
+    </div>
+
+    <button class="cta">게임 시작하기 →</button>
+
+    <div class="foot"><a href="./index.html">← 컨셉 비교로 돌아가기</a></div>
+  </div>
+</body>
+</html>
