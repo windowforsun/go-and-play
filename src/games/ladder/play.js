@@ -168,33 +168,35 @@ export function playLadder(container, ctx, data) {
   }
 
   // 개별 레인 추적 (부드러운 세그먼트 이동, 가로 이동 포함)
-  function traceLane(i) {
+  // fromBottom=true 면 결과(아래)에서 참가자(위)로 역방향으로 올라간다.
+  function traceLane(i, fromBottom = false) {
     if (running || cancelled) return;
     if (revealed.has(i)) { litEndpoints(i, true); return; }
     running = true;
     ctx.mascot.setState('thinking');
     const color = participants[i].color;
     const pts = pathPoints(i);
+    const seq = fromBottom ? pts.slice().reverse() : pts; // 역방향이면 경로를 뒤집어 아래→위로
 
-    if (ctx.reducedMotion || pts.length <= 1) {
+    if (ctx.reducedMotion || seq.length <= 1) {
       finishLane(i, color);
       return;
     }
 
     token.style.display = 'block';
     token.style.transition = 'none';
-    placeToken(pts[0], color);
+    placeToken(seq[0], color);
 
     let idx = 0;
     const step = () => {
       if (cancelled) return;
       idx++;
-      if (idx >= pts.length) {
+      if (idx >= seq.length) {
         token.style.display = 'none';
         finishLane(i, color);
         return;
       }
-      const from = pts[idx - 1], to = pts[idx];
+      const from = seq[idx - 1], to = seq[idx];
       const dist = Math.hypot(to.x - from.x, to.y - from.y);
       const dur = Math.max(55, dist / SPEED);
       token.style.transition = `top ${dur}ms linear, left ${dur}ms linear`;
@@ -215,7 +217,7 @@ export function playLadder(container, ctx, data) {
 
   function traceToResult(j) {
     const i = state.assignments.indexOf(j); // 결과 열 j에 도착하는 참가자
-    if (i >= 0) traceLane(i);
+    if (i >= 0) traceLane(i, true); // 아래에서 위로 역방향 추적
   }
 
   function revealAll() {
