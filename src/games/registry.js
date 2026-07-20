@@ -13,6 +13,7 @@ export const GAME_LIST = [
   { id: 'dart', name: '원판 다트', icon: '🎯', type: 'pick-one', load: () => import('./dart/index.js') },
   { id: 'russian', name: '러시안 룰렛', icon: '🔫', type: 'pick-one', load: () => import('./russian/index.js') },
   { id: 'cardflip', name: '카드 뒤집기', icon: '🃏', type: 'pick-one', load: () => import('./cardflip/index.js') },
+  { id: 'tapbattle', name: '동시 탭 대결', icon: '🔥', type: 'contest', load: () => import('./tapbattle/index.js') },
 ];
 
 export function findGame(id) { return GAME_LIST.find(g => g.id === id) || null; }

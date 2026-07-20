@@ -130,3 +130,20 @@
 .russian-chamber.spent { background: transparent; border-style: dashed; opacity: .5; }
 .russian-chamber.active { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,.7); background: var(--pink2); }
 .russian-odds { font-size: 15px; color: var(--dim); margin-top: 4px; }
+
+/* 동시 탭 대결 */
+.tap-stage { position: relative; margin: 10px 0; }
+.tap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.tap-zone { position: relative; overflow: hidden; min-height: 120px; border-radius: 18px; color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  cursor: pointer; user-select: none; touch-action: none; box-shadow: var(--shadow-card);
+  border: 3px solid transparent; }
+.tap-zone.win { border-color: #fff; box-shadow: 0 0 26px #fff; }
+.tap-fill { position: absolute; left: 0; bottom: 0; width: 100%; height: 0%;
+  background: rgba(255,255,255,.32); transition: height .05s linear; }
+.tap-lbl { position: relative; z-index: 1; font-size: 15px; }
+.tap-count { position: relative; z-index: 1; font-size: 30px; font-weight: bold; }
+.tap-overlay { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+  font-size: 72px; font-weight: bold; color: #fff; text-shadow: 0 4px 16px rgba(0,0,0,.6);
+  pointer-events: none; background: rgba(10,6,24,.35); border-radius: 18px; }
+.tap-overlay.show { display: flex; }
