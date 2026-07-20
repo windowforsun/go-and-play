@@ -158,3 +158,19 @@
 .online-form { display: flex; flex-direction: column; gap: 10px; max-width: 280px; margin: 10px auto; }
 .online-input { font-family: inherit; font-size: 18px; text-align: center; padding: 10px;
   border-radius: 12px; border: 1px solid rgba(255,255,255,.15); background: var(--bg2); color: var(--ink); }
+
+/* 온라인 게임 선택 / 실시간 게임 */
+.online-games { margin: 12px 0; }
+.online-gamerow { flex-wrap: wrap; }
+.online-gamerow .jelly-btn { flex: 1 1 30%; font-size: 15px; }
+.online-tapbtn { width: 100%; max-width: 340px; height: 160px; margin: 8px auto; border-radius: 20px;
+  display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #fff;
+  background: linear-gradient(135deg, var(--pink2), var(--purple)); cursor: pointer; user-select: none;
+  touch-action: none; box-shadow: 0 10px 22px rgba(255,61,132,.45); }
+.online-tapbtn:active { transform: scale(.97); }
+.online-bars { max-width: 340px; margin: 10px auto; display: flex; flex-direction: column; gap: 6px; }
+.online-bar-row { display: flex; align-items: center; gap: 8px; }
+.online-bar-name { width: 64px; font-size: 12px; color: var(--dim); text-align: right; flex: 0 0 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.online-bar-track { flex: 1; height: 16px; border-radius: 999px; background: var(--bg2); overflow: hidden; }
+.online-bar-fill { height: 100%; width: 0%; border-radius: 999px; transition: width .08s linear; }
+.online-bar-num { width: 28px; font-size: 12px; color: var(--ink); flex: 0 0 auto; }
