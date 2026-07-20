@@ -147,3 +147,14 @@
   font-size: 72px; font-weight: bold; color: #fff; text-shadow: 0 4px 16px rgba(0,0,0,.6);
   pointer-events: none; background: rgba(10,6,24,.35); border-radius: 18px; }
 .tap-overlay.show { display: flex; }
+
+/* 온라인 */
+.online-menu { flex-direction: column; }
+.online-code { font-size: 48px; font-weight: bold; letter-spacing: 8px; margin: 14px 0;
+  color: var(--yellow); text-shadow: 0 3px 10px rgba(0,0,0,.4); }
+.online-players { margin: 12px 0; }
+.online-players-title { font-size: 13px; color: var(--dim); margin-bottom: 8px; }
+.online-chip { display: inline-block; margin: 3px; font-size: 14px; color: #fff; padding: 5px 12px; border-radius: var(--radius-pill); }
+.online-form { display: flex; flex-direction: column; gap: 10px; max-width: 280px; margin: 10px auto; }
+.online-input { font-family: inherit; font-size: 18px; text-align: center; padding: 10px;
+  border-radius: 12px; border: 1px solid rgba(255,255,255,.15); background: var(--bg2); color: var(--ink); }
